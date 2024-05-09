@@ -7,7 +7,11 @@ const clientId = process.env.client_id;
 const clientSecret = process.env.client_secret;
 
 // The array of track IDs you want to skip
-const skipTrackIds = ['7fzHQizxTqy8wTXwlrgPQQ', '3Sz8P5ZFLARe2oJeb0qsyb'];
+const skipTrackIds = [
+  '7fzHQizxTqy8wTXwlrgPQQ', 
+  '3Sz8P5ZFLARe2oJeb0qsyb', 
+  '0RBw4ODUQPO4cuAOZtBGga'
+];
 
 let accessToken;
 
@@ -56,18 +60,23 @@ async function skipTrack() {
 async function main() {
   await refreshAccessToken();
 
-  setInterval(async () => {
+  async function loop() {
     try {
       const currentTrackId = await getCurrentPlayingTrack();
   
       if (skipTrackIds.includes(currentTrackId)) {
         console.log(`Skipping track: ${currentTrackId}`);
         await skipTrack();
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     } catch (error) {
       console.error('Error in main loop:', error);
+    } finally {
+      setTimeout(loop, 500);
     }
-  }, 500);
+  }
+
+  loop();
 }
 
 main();
